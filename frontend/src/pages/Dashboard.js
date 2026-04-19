@@ -39,7 +39,6 @@ function Dashboard() {
 
     <div className="dashboard-actions" style={{ marginTop: '20px', marginBottom: '20px' }}>
           <h3>Student Tasks</h3>
-          {/* This Link points to the /submit route created in App.js */}
           <Link to="/submit">
             <button className="main-auth-btn" style={{ backgroundColor: '#6a1b9a', marginBottom: '10px' }}>
               Go to Submit Assignment
