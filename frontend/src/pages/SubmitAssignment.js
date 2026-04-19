@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import "../App.css";
+import { useNavigate } from 'react-router-dom';
+import "../App.css"; // Ensure path is correct
 
 const SubmitAssignment = () => {
     const [text, setText] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
 
+        // Matching the keys with your Flask 'submit_assignment' route
         const formData = {
             student_id: "S23A0158",
-            content: text,
+            essay_content: text, // Changed 'content' to 'essay_content' to match backend
             assignment_id: 101
         };
 
@@ -25,14 +28,18 @@ const SubmitAssignment = () => {
             });
 
             const data = await response.json();
+
             if (response.ok) {
-                setMessage("✅ Submitted successfully! AI is processing your grade.");
+                setMessage("✅ Submitted successfully! Redirecting...");
                 setText('');
+                // Optional: Wait 2 seconds then go back to dashboard
+                setTimeout(() => navigate('/dashboard'), 2000);
             } else {
-                setMessage("❌ Error: " + data.message);
+                setMessage("❌ Error: " + (data.message || "Submission failed"));
             }
         } catch (error) {
-            setMessage("❌ Connection to server failed.");
+            console.error("Fetch error:", error);
+            setMessage("❌ Connection to server failed. Is Flask running?");
         } finally {
             setLoading(false);
         }
@@ -62,7 +69,7 @@ const SubmitAssignment = () => {
                         disabled={loading}
                         style={{
                             ...styles.button,
-                            backgroundColor: loading ? '#a0c4ff' : '#0056b3'
+                            backgroundColor: loading ? '#a0c4ff' : '#6a1b9a' // Use your theme purple
                         }}
                     >
                         {loading ? 'Processing...' : 'Submit to Lecturer'}
@@ -78,12 +85,19 @@ const SubmitAssignment = () => {
                         {message}
                     </div>
                 )}
+
+                <button 
+                    onClick={() => navigate('/dashboard')}
+                    style={styles.backButton}
+                >
+                    ← Back to Dashboard
+                </button>
             </div>
         </div>
     );
 };
 
-
+// Styles object for clean UI
 const styles = {
     container: {
         display: 'flex',
@@ -109,7 +123,7 @@ const styles = {
         left: 0,
         width: '100%',
         height: '5px',
-        backgroundColor: '#0056b3' // Blue accent bar
+        backgroundColor: '#6a1b9a' 
     },
     title: {
         fontSize: '24px',
@@ -141,7 +155,8 @@ const styles = {
         border: '1px solid #ddd',
         fontSize: '14px',
         boxSizing: 'border-box',
-        fontFamily: 'inherit'
+        fontFamily: 'inherit',
+        resize: 'vertical'
     },
     button: {
         width: '100%',
@@ -159,6 +174,17 @@ const styles = {
         padding: '12px',
         borderRadius: '4px',
         textAlign: 'center',
+        fontSize: '14px'
+    },
+    backButton: {
+        marginTop: '20px',
+        display: 'block',
+        width: '100%',
+        background: 'none',
+        border: 'none',
+        color: '#6a1b9a',
+        cursor: 'pointer',
+        textDecoration: 'underline',
         fontSize: '14px'
     }
 };
