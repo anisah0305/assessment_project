@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -36,6 +36,16 @@ function Dashboard() {
           <p><strong>Email:</strong> {user?.email}</p>
           <p><strong>Role:</strong> {role}</p>
         </div>
+
+    <div className="dashboard-actions" style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <h3>Student Tasks</h3>
+          {/* This Link points to the /submit route created in App.js */}
+          <Link to="/submit">
+            <button className="main-auth-btn" style={{ backgroundColor: '#6a1b9a', marginBottom: '10px' }}>
+              Go to Submit Assignment
+            </button>
+          </Link>
+        </div> 
 
         <button className="main-auth-btn" onClick={handleLogout}>
           Logout
