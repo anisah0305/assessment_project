@@ -1,15 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_mysqldb import MySQL  # Import the MySQL tool
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 CORS(app)
 
 # --- MySQL Configuration ---
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'       # Default XAMPP user
-app.config['MYSQL_PASSWORD'] = ''       # Default XAMPP password is empty
-app.config['MYSQL_DB'] = 'assessment_db' # This must match the DB you created in phpMyAdmin
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'assessment_db'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
@@ -52,26 +52,23 @@ def submit_assignment():
         data = request.json
         student_id = data.get('student_id')
         essay_content = data.get('essay_content')
-        assignment_id = data.get('assignment_id', 101) # Default ID if not provided
+        assignment_id = data.get('assignment_id', 101)
+
+        if not student_id or not essay_content or len(essay_content.strip()) < 10:
+            print(f"⚠️ Blocked invalid submission attempt from Student ID: {student_id}")
+            return jsonify({
+                "status": "error",
+                "message": "Validation Failed: Essay is too short or Student ID is missing!"
+            }), 400
 
         # --- DATABASE LOGIC ---
-        # 1. Open a connection
         cur = mysql.connection.cursor()
-        
-        # 2. Prepare the SQL command
         query = "INSERT INTO submissions (student_id, essay_content, assignment_id) VALUES (%s, %s, %s)"
-        
-        # 3. Execute with data
         cur.execute(query, (student_id, essay_content, assignment_id))
-        
-        # 4. Save changes to the database
         mysql.connection.commit()
-        
-        # 5. Close the cursor
         cur.close()
 
-        # Print to terminal for your own confirmation
-        print(f"\n✅ Data saved to MySQL for: {student_id}")
+        print(f"\n✅ Data successfully saved to MySQL for: {student_id}")
         
         return jsonify({
             "status": "success",
